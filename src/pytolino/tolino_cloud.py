@@ -332,7 +332,37 @@ class Client(object):
                 inventory = uploaded_ebooks + purchased_ebook
                 return inventory
 
-    def add_to_collection(self, book_id, collection_name):
+    def sync(self):
+        """add a book to a collection on the cloud
+
+        :book_id: identify the book on the cloud
+        :collection_name: str name
+
+        """
+
+        payload = {
+                "revision": None,
+                "patches": [
+                    ]
+                }
+
+        host_response = self.session.patch(
+                self.server_settings['sync_data_url'],
+                data=json.dumps(payload),
+                headers={
+                    'content-type': 'application/json',
+                    't_auth_token': self.access_token,
+                    'hardware_id': self.hardware_id,
+                    'reseller_id': self.server_settings['partner_id'],
+                    'client_type': 'TOLINO_WEBREADER',
+                    }
+                )
+        self._log_requests(host_response)
+        if host_response.status_code != 200:
+            raise PytolinoException('sync failed')
+        return host_response
+        
+        def add_to_collection(self, book_id, collection_name):
         """add a book to a collection on the cloud
 
         :book_id: identify the book on the cloud
