@@ -332,7 +332,7 @@ class Client(object):
                 inventory = uploaded_ebooks + purchased_ebook
                 return inventory
 
-    def sync(self):
+    def sync(self, revision = None):
         """add a book to a collection on the cloud
 
         :book_id: identify the book on the cloud
@@ -341,7 +341,7 @@ class Client(object):
         """
 
         payload = {
-                "revision": None,
+                "revision": revision,
                 "patches": [
                     ]
                 }
@@ -359,6 +359,8 @@ class Client(object):
                 )
         self._log_requests(host_response)
         if host_response.status_code != 200:
+            print(host_response.text)
+            print(host_response.status_code)
             raise PytolinoException('sync failed')
         return host_response
         
