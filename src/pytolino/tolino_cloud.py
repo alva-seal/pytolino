@@ -362,7 +362,7 @@ class Client(object):
             raise PytolinoException('sync failed')
         return host_response
         
-    def add_to_collection(self, book_id, collection_name):
+    def add_to_collection(self, book_id, collection_name, revision = None):
         """add a book to a collection on the cloud
 
         :book_id: identify the book on the cloud
@@ -371,7 +371,7 @@ class Client(object):
         """
 
         payload = {
-                "revision": None,
+                "revision": revision,
                 "patches": [{
                     "op": "add",
                     "value": {
