@@ -333,10 +333,9 @@ class Client(object):
                 return inventory
 
     def sync(self, revision = None):
-        """add a book to a collection on the cloud
+        """for getting changes and annotations synced from the cloud
 
-        :book_id: identify the book on the cloud
-        :collection_name: str name
+        :revision: identifys the the last sync with the cloud
 
         """
 
@@ -361,12 +360,13 @@ class Client(object):
         if host_response.status_code != 200:
             raise PytolinoException('sync failed')
         return host_response
-        
+
     def add_to_collection(self, book_id, collection_name, revision = None):
         """add a book to a collection on the cloud
 
         :book_id: identify the book on the cloud
         :collection_name: str name
+        :revision: identifys the the last sync with the cloud
 
         """
 
@@ -397,6 +397,43 @@ class Client(object):
         self._log_requests(host_response)
         if host_response.status_code != 200:
             raise PytolinoException('add to collection failed')
+    
+    def remove_from_collection(self, book_id, collection_name, revision = None):
+        """removes a book from a collection on the cloud
+
+        :book_id: identify the book on the cloud
+        :collection_name: str name
+        :revision: identifys the the last sync with the cloud
+
+        """
+
+        payload = {
+                "revision": revision,
+                "patches": [{
+                    "op": "remove",
+                    "value": {
+                        "modified": round(time.time() * 1000),
+                        "name": collection_name,
+                        "category": "collection",
+                    },
+                    "path": f"/publications/{book_id}/tags"
+                    }]
+                }
+
+        host_response = self.session.patch(
+                self.server_settings['sync_data_url'],
+                data=json.dumps(payload),
+                headers={
+                    'content-type': 'application/json',
+                    't_auth_token': self.access_token,
+                    'hardware_id': self.hardware_id,
+                    'reseller_id': self.server_settings['partner_id'],
+                    'client_type': 'TOLINO_WEBREADER',
+                    }
+                )
+        self._log_requests(host_response)
+        if host_response.status_code != 200:
+            raise PytolinoException('remove from collection failed')
 
     def upload_metadata(self, book_id, **new_metadata):
         """upload some metadata to a specific book on the cloud
