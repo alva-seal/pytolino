@@ -359,8 +359,6 @@ class Client(object):
                 )
         self._log_requests(host_response)
         if host_response.status_code != 200:
-            print(host_response.text)
-            print(host_response.status_code)
             raise PytolinoException('sync failed')
         return host_response
         
